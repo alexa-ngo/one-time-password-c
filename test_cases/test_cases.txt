@@ -1,0 +1,30 @@
+Here are some test case:
+
+Test case #1:
+data: AELOZ
+key: IBZTA
+results: IFKHZ
+
+
+Test case #2:
+data: SHANNA
+key: AMY
+results: STYNZY
+
+
+Test case #3:
+data: WOW
+key: LAZL
+results: HOV
+
+
+Test case #4:
+data: WOW
+key: LLL
+results: HZH
+
+
+Test case #5:
+data: RTZA
+key: AZEY
+results: RSDY
