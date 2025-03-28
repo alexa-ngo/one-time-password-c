@@ -52,8 +52,8 @@ The encryption server would respond back to the client with: HELLO
 
 # To Run this Program You'll Need: 
 
--the string we want to encrypt and decrypt: The format of the string that we want to encrypt and decrypt should not have any spaces and must be in all uppercase characters
--key file: a key file containing one string that serves as both the encryption and decryption key 
--two terminals opened where one terminal will be the client, and the second terminal is the server.
+- the string we want to encrypt and decrypt: The format of the string that we want to encrypt and decrypt should not have any spaces and must be in all uppercase characters
+- key file: a key file containing one string that serves as both the encryption and decryption key 
+- two terminals opened where one terminal will be the client, and the second terminal is the server.
 
 Yep, happy encrypting and decrypting! :)
