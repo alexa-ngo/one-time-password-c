@@ -1,11 +1,11 @@
-#include <arpa/inet.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/types.h>
+//#include <arpa/inet.h>
+//#include <signal.h>
+//#include <stdio.h>
+//#include <stdlib.h>
+//#include <string.h>
+//#include <sys/socket.h>
+//#include <sys/stat.h>
+//#include <sys/types.h>
 #include <unistd.h>
 #include "dec_server.h"
 
@@ -13,6 +13,11 @@
 #define TOTAL_CHAR_OF_ALPHABET 26
 
 // This is the implementation. 
+
+void handle_shutdown(int sig) {
+	fprintf(stderr, "Bye!\n");
+	exit(0);
+}	
 
 void bind_to_port(int socket, int portNum) {
 	struct sockaddr_in name;

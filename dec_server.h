@@ -1,7 +1,22 @@
 #ifndef DEC_SERVER
 #define DEC_SERVER 
 
+#include <arpa/inet.h>
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+
+
 // This is the declaration.
+
+void handle_shutdown(int sig);
 
 void bind_to_port(int socket, int portNum);
 
