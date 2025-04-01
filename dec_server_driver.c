@@ -26,8 +26,6 @@ int main(int argc, char* argv[]) {
 		exit(1);
 	}
 
-	int listener_d;
-
 	// Calls the handle_shutdown
 	if (catch_signal(SIGINT, handle_shutdown)) {
 		fprintf(stderr, "Can't set the interrupt handler\n");
@@ -36,7 +34,7 @@ int main(int argc, char* argv[]) {
 
 	int portNum = atoi(argv[1]);
 
-	listener_d = listenAndBindToSocket(listener_d, portNum);
+	int listener_d = listenAndBindToSocket(portNum);
 
 	struct sockaddr_storage client_addr;
 	unsigned int address_size = sizeof(client_addr);

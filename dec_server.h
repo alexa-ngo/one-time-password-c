@@ -33,7 +33,7 @@ int findKeySize(char* theKey);
 
 int findDataSize(char* theData); 
 
-int listenAndBindToSocket(int listener_d, int portNum); 
+int listenAndBindToSocket(int portNum); 
 
 char *decryptData(char *returnedEncryptedData, char *keyFile);
 

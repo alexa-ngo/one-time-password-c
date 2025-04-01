@@ -1,16 +1,4 @@
-//#include <arpa/inet.h>
-//#include <signal.h>
-//#include <stdio.h>
-//#include <stdlib.h>
-//#include <string.h>
-//#include <sys/socket.h>
-//#include <sys/stat.h>
-//#include <sys/types.h>
-#include <unistd.h>
 #include "dec_server.h"
-
-#define LETTER_OF_A 65
-#define TOTAL_CHAR_OF_ALPHABET 26
 
 // This is the implementation. 
 
@@ -121,10 +109,10 @@ int findDataSize(char* theData) {
 	return dataSize;
 } 
 
-int listenAndBindToSocket(int listener_d, int portNum) {
+int listenAndBindToSocket(int portNum) {
 
 	// Listen and bind to a socket
-	listener_d = open_listener_socket();
+	int listener_d = open_listener_socket();
 	bind_to_port(listener_d, portNum);
 
 	// Listen to the connection
