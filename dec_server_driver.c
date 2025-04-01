@@ -1,16 +1,6 @@
 #include <arpa/inet.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
 #include "dec_server.h"
 
-#define LETTER_OF_A 65
-#define TOTAL_CHAR_OF_ALPHABET 26
 
 // This program encrypts a data string where
 // the letter A has the value of 0, and the letter Z has the value of 25.

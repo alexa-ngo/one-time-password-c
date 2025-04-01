@@ -12,7 +12,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-
+#define LETTER_OF_A 65
+#define TOTAL_CHAR_OF_ALPHABET 26
 
 // This is the declaration.
 
