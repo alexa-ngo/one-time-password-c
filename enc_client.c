@@ -1,18 +1,6 @@
-#include <netdb.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
+#include "enc_client.h"
 
-#define MAX_BUFFER_SIZE 1024
-
-// This client takes a hostname, port number, and data as a command-line argument. 
-// The client then use the socket to connect and send.
-// NOTE: The server assumes that there is a /r/n
-
-// Usage: ./client.out <127.0.0.1> <8888> <dataString>
+// This is the implementation of the encryption server.
 
 int main(int argc, char* argv[]) {	
 
