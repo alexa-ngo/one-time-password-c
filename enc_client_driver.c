@@ -1,15 +1,9 @@
-#include <netdb.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
+#include "enc_client.h"
 
 #define MAX_BUFFER_SIZE 1024
 
-// This is a decryption client that takes a hostname, port number, and data as a 
-// command-line argument. The client will use the socket to connect and send.
+// This client takes a hostname, port number, and data as a command-line argument. 
+// The client then use the socket to connect and send.
 // NOTE: The server assumes that there is a /r/n
 
 // Usage: ./client.out <127.0.0.1> <8888> <dataString>
@@ -19,7 +13,7 @@ int main(int argc, char* argv[]) {
 	if (argc != 4) {
 		fprintf(stderr, "Usage: <hostname> <port> <data>");
 		exit(1);
-	}
+}
 	
 	const char *hostname = argv[1];
 	const char *port = argv[2];
@@ -51,13 +45,13 @@ int main(int argc, char* argv[]) {
 
 	freeaddrinfo(res);
 
-	// The server requires an "\r\n" to be sent along with the data
+	// Malloc a new string with three more characters because our server 
+	// REQUIRES a \r\n
 	char *newstr = malloc(sizeof(char) * (strlen(dataStr) + 2));
-	strcpy(newstr, dataStr);
+	strcpy(newstr, dataStr);	
 	strcat(newstr, "\n");
-
-	ssize_t bytes_sent = send(sockfd, newstr, strlen(newstr), 0);
 	
+	ssize_t bytes_sent = send(sockfd, newstr, strlen(newstr), 0);
 	if (bytes_sent == -1) {
 		perror("send");
 		close(sockfd);
@@ -65,9 +59,7 @@ int main(int argc, char* argv[]) {
 	}	
 	
 	char buffer[MAX_BUFFER_SIZE]; 
-
 	ssize_t bytes_received = recv(sockfd, buffer, MAX_BUFFER_SIZE - 1, 0);
-
 	if (bytes_received == -1) {
 		perror("recv");
 		close(sockfd);
@@ -76,12 +68,9 @@ int main(int argc, char* argv[]) {
 	
 	// Add a null terminating character
 	buffer[bytes_received] = '\0';
-
-	// Print the decrypted result
 	printf("%s\n", buffer);
 
-	// Free the new string before closing out the socket
-	free(newstr);	
+	free(newstr);
 	
 	close(sockfd);
 	

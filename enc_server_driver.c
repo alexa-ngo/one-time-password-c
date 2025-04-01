@@ -1,4 +1,3 @@
-#include <arpa/inet.h>
 #include "enc_server.h"
 
 // This program encrypts a data string where

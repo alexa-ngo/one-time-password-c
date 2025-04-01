@@ -1,4 +1,3 @@
-#include <arpa/inet.h>
 #include "dec_server.h"
 
 
