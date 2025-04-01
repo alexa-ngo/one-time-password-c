@@ -1,28 +1,7 @@
-#include <arpa/inet.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
+#include "enc_server.h"
 
-#define LETTER_OF_A 65
-#define TOTAL_CHAR_OF_ALPHABET 26
+// This is the implementation of the encryption server.
 
-// This program encrypts a data string where
-// the letter A has the value of 0, and the letter Z has the value of 25.
-// The characters of a key are also converted to integers ranging from 0 to 25. 
-// We will add the integer of each character of the data.txt with each character of the key. 
-// If the sum of the character of the data and key is greater than 25, we will 
-// use the mod operator of 26 to wrap around either the string of the data or the key to encrypt.
-
-// The client should be activated with: ./client_a.out 127.0.0.1 PORT_NUM_123
-// The server should be activated with: ./server_a.out PORT_NUM_123 key.txt
-
-
-// Encrypt the data. If the data is longer than the key, loop through the key 	
 char* dataLongerThanOrEqualToKey(char* theData, int lengthOfData, char* theKey, int lengthOfKey) {			
 	char* outputMallocedDataStr = malloc(sizeof(char) * lengthOfData);
 	
@@ -143,12 +122,8 @@ int read_in(int socket, char* buf, int len) {
 
 // If someone hits Ctrl-C while the server is running, the function will 
 // close the socket before the program ends
-int listener_d;
 
 void handle_shutdown(int sig) {
-	if (listener_d) {
-		close(listener_d);
-	}
 	fprintf(stderr, "Bye!\n");	
 	exit(0);
 }	
@@ -238,10 +213,10 @@ char* startEncryption(char* theData, char* theKey) {
 	fclose(key);
 }
 
-void listenAndBindToSocket(int portNum) {
+int listenAndBindToSocket(int portNum) {
 
 	// Listen and bind to a socket
-	listener_d = open_listener_socket();
+	int	listener_d = open_listener_socket();
 	bind_to_port(listener_d, portNum);
 
 	// Listen to the connection
@@ -250,87 +225,7 @@ void listenAndBindToSocket(int portNum) {
 		fprintf(stderr, "Can't listen\n");
 		exit(1);
 	}
+	return listener_d;
+
 }
-
-
-int main(int argc, char* argv[]) {
-
-	if (argc < 3){
-		fprintf(stderr, "Example usage: ./a.out PORT_NUM key.txt\n");
-		exit(1);
-	}
-	
-	// Error if the key.txt file does not exist
-	char* keyFile = argv[2];
-	if (keyFile == NULL) {
-		fprintf(stderr, "The key.txt file does not exist\n");
-		exit(1);
-	}
-
-	// Calls the handle_shutdown
-	if (catch_signal(SIGINT, handle_shutdown)) {
-		fprintf(stderr, "Can't set the interrupt handler\n");
-		exit(1);
-	}
-
-	int portNum = atoi(argv[1]);
-	listenAndBindToSocket(portNum);
-
-	struct sockaddr_storage client_addr;
-	unsigned int address_size = sizeof(client_addr);
-	
-	puts("Waiting for the connection\n");			
-	
-	// Buffer used to read in the data
-	char buf[255];
-	
-	char* returnedEncryptedData;
-	
-	// Loop to accept connections
-	while(1) {
-
-		// Accept the connections
-		int connect_d = accept(listener_d, (struct sockaddr *)&client_addr, &address_size);
-		
-		if (connect_d == -1) {
-			fprintf(stderr, "Can't open secondary socket");
-			exit(1);
-		}
-
-		// Forks a process
-		int childPid = fork();
-		if (childPid == -1) {
-			fprintf(stderr, "Could not fork the child\n");
-			exit(1);
-		}
-
-		if (childPid > 0) {
-			printf("Handling connection by forking request to child PID: %d\n", childPid); 
-		} else  {
-			// Close the listening descriptor
-			close(listener_d);
-
-			// Read in the data
-			read_in(connect_d, buf, sizeof(buf));		
-		
-			// Encrypt the data
-			returnedEncryptedData = startEncryption(buf, keyFile);	
-		
-			// Send this data back to the client
-			sendThisdataToTheClient(connect_d, returnedEncryptedData);	
-				
-			// Free the pointer before closing the socket
-			free(returnedEncryptedData);	
-			
-			// The child should close and then exit and not the server
-			close(connect_d);
-			exit(0);
-		}
-	}
-	// Close the listener descriptor for the parent
-	close(listener_d);
-	return 0;
-};
-
-
 

@@ -15,7 +15,7 @@
 #define LETTER_OF_A 65
 #define TOTAL_CHAR_OF_ALPHABET 26
 
-// This is the declaration.
+// This is the declaration and function signatures of the decryption server.
 
 void handle_shutdown(int sig);
 
