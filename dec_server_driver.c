@@ -85,8 +85,9 @@ int read_in(int socket, char* buf, int len) {
 
 // If someone hits Ctrl-C when the server is running, the function will 
 // close the socket before the program ends
+int listener_d;
 
-void handle_shutdown(int listener_d) {
+void handle_shutdown(int sig) {
 	if (listener_d) {
 		close(listener_d);
 	}
@@ -141,7 +142,7 @@ int findDataSize(char* theData) {
 	return dataSize;
 } 
 
-void listenAndBindToSocket(int listener_d, int portNum) {
+int listenAndBindToSocket(int listener_d, int portNum) {
 
 	// Listen and bind to a socket
 	listener_d = open_listener_socket();
@@ -153,6 +154,7 @@ void listenAndBindToSocket(int listener_d, int portNum) {
 		fprintf(stderr, "Can't listen\n");
 		exit(1);
 	}
+	return listener_d;
 }
 
 // Decrypts the input string
@@ -215,17 +217,16 @@ int main(int argc, char* argv[]) {
 	}
 
 	// Calls the handle_shutdown
-	//
-	int listener_d;
-
 	if (catch_signal(SIGINT, handle_shutdown)) {
 		fprintf(stderr, "Can't set the interrupt handler\n");
 		exit(1);
 	}
 
+	int listener_d;
+
 	int portNum = atoi(argv[1]);
 
-	listenAndBindToSocket(listener_d, portNum);
+	listener_d = listenAndBindToSocket(listener_d, portNum);
 
 	struct sockaddr_storage client_addr;
 	unsigned int address_size = sizeof(client_addr);
