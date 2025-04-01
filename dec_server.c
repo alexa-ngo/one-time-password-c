@@ -7,20 +7,12 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include "dec_server.h"
 
 #define LETTER_OF_A 65
 #define TOTAL_CHAR_OF_ALPHABET 26
 
-// This program encrypts a data string where
-// the letter A has the value of 0, and the letter Z has the value of 25.
-// The characters of a key are also converted to integers ranging from 0 to 25. 
-// We will add the integer of each character of the data.txt with each character of the key. 
-// If the sum of the character of the data and key is greater than 25, we will 
-// use the mod operator of 26 to wrap around either the string of the data or the key to encrypt.
-
-// The client should be activated with: ./client.a.out 127.0.0.1 PORT_NUM_123 INPUT_STRING
-// The server should be activated with: ./server.a.out PORT_NUM_123 key.txt
-
+// This is the implementation. 
 
 void bind_to_port(int socket, int portNum) {
 	struct sockaddr_in name;
@@ -60,9 +52,6 @@ int open_listener_socket() {
 	return s;
 }
 
-// This function wraps around the receive() function and 
-// reads in the data sent from the socket and
-// adds a null terminator at the end of the string.
 int read_in(int socket, char* buf, int len) {
 
 	char* s = buf;
@@ -83,19 +72,6 @@ int read_in(int socket, char* buf, int len) {
 	return len - slen;
 }
 
-// If someone hits Ctrl-C when the server is running, the function will 
-// close the socket before the program ends
-int listener_d;
-
-void handle_shutdown(int sig) {
-	if (listener_d) {
-		close(listener_d);
-	}
-	fprintf(stderr, "Bye!\n");
-	exit(0);
-}	
-
-// Sends the data to the client
 int sendThisdataToTheClient(int socket, char* s) {
 	int result = send(socket, s, strlen(s), 0);
 	
@@ -107,7 +83,6 @@ int sendThisdataToTheClient(int socket, char* s) {
 	return 0;
 }
 
-// Returns the number of characters in the result
 int findKeySize(char* theKey) {
 
 	struct stat keyResult;
@@ -127,7 +102,6 @@ int findKeySize(char* theKey) {
 	return keySize;
 }
 
-// Finds the number of characters in the result
 int findDataSize(char* theData) {
 
 	// The data is subtracted by 1 to account for the terminating character
@@ -157,7 +131,6 @@ int listenAndBindToSocket(int listener_d, int portNum) {
 	return listener_d;
 }
 
-// Decrypts the input string
 char *decryptData(char *returnedEncryptedData, char *keyFile) {
 
 	// The data size is one less
@@ -202,86 +175,6 @@ char *decryptData(char *returnedEncryptedData, char *keyFile) {
 	return outputMallocedDecrytedString;
 }
 
-int main(int argc, char* argv[]) {
-
-	if (argc < 3) {
-		fprintf(stderr, "Example usage: ./a.out <PORT_NUM> <THE_KEY.txt>\n");
-		exit(1);
-	}
-
-	// If the key file does not exist
-	char* keyFile = argv[2];
-	if (keyFile == NULL) {
-		fprintf(stderr, "The key.txt file does not exist\n");
-		exit(1);
-	}
-
-	// Calls the handle_shutdown
-	if (catch_signal(SIGINT, handle_shutdown)) {
-		fprintf(stderr, "Can't set the interrupt handler\n");
-		exit(1);
-	}
-
-	int listener_d;
-
-	int portNum = atoi(argv[1]);
-
-	listener_d = listenAndBindToSocket(listener_d, portNum);
-
-	struct sockaddr_storage client_addr;
-	unsigned int address_size = sizeof(client_addr);
-	
-	puts("Waiting for the connection\n");			
-	
-	// Buffer used to read in the data
-	char buf[255];
-
-	char* returnedEncryptedData;
-
-	// Loop to accept connections
-	while(1) {
-
-		// Accept the connections
-		int connect_d = accept(listener_d, (struct sockaddr *)&client_addr, &address_size);
-		
-		if (connect_d == -1) {
-			fprintf(stderr, "Can't open secondary socket");
-			exit(1);
-		}
-
-		// Forks the child process
-		int childPid = fork();
-		if (childPid == -1) {
-			fprintf(stderr, "Could not fork the child\n");
-			exit(1);
-		}
-
-		if (childPid > 0) {
-			printf("Handling connection by forking request to child PID: %d\n", childPid);
-		} else {
-			close(listener_d);
-
-			// Read in the data
-			read_in(connect_d, buf, sizeof(buf));
-		
-			// Encrypt the data
-			char* decryptedResult = decryptData(buf, keyFile);
-			
-			// Send this data back to the client
-			sendThisdataToTheClient(connect_d, decryptedResult);
-
-			// Free the pointer before cling the socket
-			free(decryptedResult);
-
-			// The child should close and then exit and not the server
-			close(connect_d);
-			exit(0);
-		}
-	}
-	// Close the descriptor of the parent process
-	close(listener_d);
-	return 0;
-};
 
 
 
