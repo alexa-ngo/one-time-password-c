@@ -85,9 +85,8 @@ int read_in(int socket, char* buf, int len) {
 
 // If someone hits Ctrl-C when the server is running, the function will 
 // close the socket before the program ends
-int listener_d;
 
-void handle_shutdown(int sig) {
+void handle_shutdown(int listener_d) {
 	if (listener_d) {
 		close(listener_d);
 	}
@@ -216,13 +215,13 @@ int main(int argc, char* argv[]) {
 		exit(1);
 	}
 
+	int listener_d;
+
 	// Calls the handle_shutdown
 	if (catch_signal(SIGINT, handle_shutdown)) {
 		fprintf(stderr, "Can't set the interrupt handler\n");
 		exit(1);
 	}
-
-	int listener_d;
 
 	int portNum = atoi(argv[1]);
 
